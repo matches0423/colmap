@@ -1,12 +1,12 @@
 from collections.abc import MutableSequence
 from types import ModuleType
-from typing import Any
+from typing import Any, Optional
 
 
 def import_module_symbols(
     dst_vars: dict[str, Any],
     src_module: ModuleType,
-    exclude: set[str] | None = None,
+    exclude: Optional[set[str]] = None,
 ) -> MutableSequence[str]:
     symbols = {}
     for n, s in vars(src_module).items():
