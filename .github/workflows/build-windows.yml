@@ -13,6 +13,7 @@ on:
     types: [ assigned, opened, synchronize, reopened ]
   release:
     types: [ published, edited ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -22,19 +23,12 @@ jobs:
       matrix:
         config: [
           {
-            os: windows-2025,
+            os: windows-latest,
             cmakeBuildType: Release,
             cudaEnabled: true,
             testsEnabled: true,
             exportPackage: true,
-          },
-          {
-            os: windows-2025,
-            cmakeBuildType: Release,
-            cudaEnabled: false,
-            testsEnabled: true,
-            exportPackage: true,
-          },
+          }
         ]
 
     env:
@@ -44,9 +38,9 @@ jobs:
       CCACHE_BASEDIR: ${{ github.workspace }}
       GLOG_v: 2
       GLOG_logtostderr: 1
-      CUDA_MAJOR_VERSION: 12
-      CUDA_MINOR_VERSION: 9
-      CUDA_PATCH_VERSION: 1
+      CUDA_MAJOR_VERSION: 11
+      CUDA_MINOR_VERSION: 8
+      CUDA_PATCH_VERSION: 0
 
     steps:
       - uses: actions/checkout@v4
@@ -135,7 +129,8 @@ jobs:
             -DCUDAToolkit_ROOT="${{ steps.cuda-toolkit.outputs.CUDA_PATH }}" `
             -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" `
             -DVCPKG_TARGET_TRIPLET=x64-windows-release `
-            -DCMAKE_INSTALL_PREFIX=install
+            -DCMAKE_INSTALL_PREFIX=install `
+            -DCMAKE_CUDA_FLAGS="--allow-unsupported-compiler -D_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH"
           ninja
 
       - name: Run tests
